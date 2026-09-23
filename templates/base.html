@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand"><span class="brand-mark">🧾</span> NF-e Manager</div>
+            <nav class="nav">
+                {% set items = [
+                    ('Dashboard', '/'),
+                    ('Empresas / CNPJs', '/empresas'),
+                    ('Consultar SEFAZ', '/consultar'),
+                    ('Importar XML', '/importar'),
+                    ('XML → PDF', '/xml_para_pdf'),
+                    ('Documentos', '/documentos')
+                ] %}
+                {% for name, route in items %}
+                    <a href="{{ route }}" class="{{ 'active' if active == name else '' }}">{{ name }}</a>
+                {% endfor %}
+            </nav>
+        </aside>
+        <main class="main">
+            <div class="topbar"><h1>{{ title }}</h1></div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

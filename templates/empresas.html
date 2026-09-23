@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="form-card">
+    <form method="post" enctype="multipart/form-data">
+        <div class="form-grid">
+            <div class="field">
+                <label for="cnpj">CNPJ</label>
+                <input id="cnpj" name="cnpj" data-mask="cnpj" placeholder="00.000.000/0000-00" required>
+            </div>
+            <div class="field">
+                <label for="razao">Razão social</label>
+                <input id="razao" name="razao" placeholder="Nome da empresa" required>
+            </div>
+            <div class="field">
+                <label for="uf">UF</label>
+                <select id="uf" name="uf">
+                    <option value="SP">SP</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="ambiente">Ambiente</label>
+                <select id="ambiente" name="ambiente">
+                    <option value="Produção">Produção</option>
+                    <option value="Homologação">Homologação</option>
+                </select>
+            </div>
+            <div class="field" style="grid-column: 1 / -1;">
+                <label for="certificado_arquivo">Arquivo do certificado A1 (.pfx/.p12)</label>
+                <input id="certificado_arquivo" type="file" name="certificado_arquivo" accept=".pfx,.p12">
+                <small class="muted">Deixe em branco para manter o certificado já enviado para esta empresa.</small>
+            </div>
+            <div class="field" style="grid-column: 1 / -1;">
+                <label for="senha">Senha do certificado</label>
+                <input id="senha" type="password" name="senha" placeholder="Digite a senha do certificado" required>
+            </div>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Salvar empresa</button>
+        </div>
+    </form>
+</div>
+
+<div class="panel" style="margin-top: 24px;">
+    <h2 class="section-title">Empresas cadastradas</h2>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr><th>CNPJ</th><th>Razão social</th><th>Certificado</th><th>Ambiente</th></tr>
+            </thead>
+            <tbody>
+                {% if empresas %}
+                    {% for e in empresas %}
+                        <tr>
+                            <td>{{ mascara_cnpj(e['cnpj']) }}</td>
+                            <td>{{ e['razao_social'] }}</td>
+                            <td>{{ e['certificado'].split('/')[-1].split('\\')[-1] }}</td>
+                            <td><span class="pill">{{ e['ambiente'] }}</span></td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr><td colspan="4" class="muted">Nenhuma empresa cadastrada.</td></tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

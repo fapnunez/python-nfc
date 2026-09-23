@@ -1,0 +1,1 @@
+web: python -m gunicorn --bind 0.0.0.0:${PORT:-5003} --access-logfile - --error-logfile - --capture-output app:app

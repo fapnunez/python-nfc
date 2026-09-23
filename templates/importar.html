@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="form-card">
+    <form method="post" enctype="multipart/form-data">
+        <div class="field">
+            <label for="xml_files">Selecione arquivos XML</label>
+            <input id="xml_files" type="file" name="xml_files" multiple accept=".xml">
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Importar arquivos</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

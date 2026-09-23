@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="form-card">
+    {% if docs %}
+        <form method="post">
+            <div class="field">
+                <label for="doc_id">Selecione o XML</label>
+                <select id="doc_id" name="doc_id">
+                    {% for d in docs %}
+                        <option value="{{ d['id'] }}">{{ d['chave'] or d['id'] }} | {{ d['tipo'] }} | {{ d['data_emissao'] or '' }} | R$ {{ d['valor'] or 0 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Gerar PDF</button>
+            </div>
+        </form>
+    {% else %}
+        <p class="muted">Nenhum XML disponível.</p>
+    {% endif %}
+</div>
+{% endblock %}

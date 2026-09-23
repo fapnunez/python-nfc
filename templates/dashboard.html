@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="label">Empresas</div>
+        <div class="value">{{ empresas }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">Documentos</div>
+        <div class="value">{{ documentos }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">XMLs armazenados</div>
+        <div class="value">{{ xmls }}</div>
+    </div>
+</div>
+
+<div class="panel">
+    <h2 class="section-title">Resumo</h2>
+    <div class="info-box">
+        A consulta de NF-e contra um CNPJ usa o serviço nacional NFeDistribuicaoDFe. A consulta é incremental por NSU; o período é usado como filtro visual após a distribuição.
+    </div>
+</div>
+{% endblock %}

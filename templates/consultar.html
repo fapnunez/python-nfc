@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="form-card">
+    <form method="post">
+        <div class="form-grid">
+            <div class="field">
+                <label for="empresa_id">Empresa</label>
+                <select id="empresa_id" name="empresa_id">
+                    {% if empresas %}
+                        {% for e in empresas %}
+                            <option value="{{ e['id'] }}">{{ e['razao_social'] }} — {{ mascara_cnpj(e['cnpj']) }}</option>
+                        {% endfor %}
+                    {% else %}
+                        <option value="">Nenhuma empresa cadastrada</option>
+                    {% endif %}
+                </select>
+            </div>
+            <div class="field">
+                <label for="inicio">Data inicial</label>
+                <input id="inicio" type="date" name="inicio" value="{{ today }}">
+            </div>
+            <div class="field">
+                <label for="fim">Data final</label>
+                <input id="fim" type="date" name="fim" value="{{ today }}">
+            </div>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Consultar NF-e</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

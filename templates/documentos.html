@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="panel">
+    <h2 class="section-title">Documentos armazenados</h2>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr><th>Chave</th><th>Tipo</th><th>Emissão</th><th>Valor</th><th>XML</th><th>PDF</th></tr>
+            </thead>
+            <tbody>
+                {% if docs %}
+                    {% for d in docs %}
+                        <tr>
+                            <td>{{ d['chave'] or d['id'] }}</td>
+                            <td>{{ d['tipo'] or '' }}</td>
+                            <td>{{ d['data_emissao'] or '' }}</td>
+                            <td>R$ {{ d['valor'] or 0 }}</td>
+                            <td>
+                                {% if d.get('xml_path') and d['xml_path'] and d['xml_path'] is not none %}
+                                    <a class="link-btn" href="{{ url_for('download_xml', doc_id=d['id']) }}">Baixar XML</a>
+                                {% else %}
+                                    <span class="muted">—</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if d.get('xml_path') and d['xml_path'] and d['xml_path'] is not none %}
+                                    <a class="link-btn danger" href="{{ url_for('gerar_pdf_externo', doc_id=d['id']) }}">Gerar PDF</a>
+                                {% else %}
+                                    <span class="muted">—</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr><td colspan="6" class="muted">Nenhum documento cadastrado.</td></tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
