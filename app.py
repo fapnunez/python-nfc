@@ -303,7 +303,7 @@ def gerar_pdf_externo(doc_id):
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", "5003"))
+    port = int(os.environ.get("PORT", "5004"))
     hostname = socket.gethostname()
     try:
         local_ip = socket.gethostbyname(hostname)
