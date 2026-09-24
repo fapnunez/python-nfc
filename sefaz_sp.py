@@ -1,6 +1,7 @@
 import base64
 import gzip
 import os
+from datetime import datetime
 import xml.etree.ElementTree as ET
 
 from requests_pkcs12 import Pkcs12Adapter
@@ -8,6 +9,14 @@ import requests
 
 PROD_URL = "https://www1.nfe.fazenda.gov.br/NFeDistribuicaoDFe/NFeDistribuicaoDFe.asmx"
 HOM_URL = "https://hom.nfe.fazenda.gov.br/NFeDistribuicaoDFe/NFeDistribuicaoDFe.asmx"
+
+LOG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dados", "sefaz_chamadas.log")
+
+def _registrar_chamada(cnpj, ultimo_nsu, cstat, motivo):
+    os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
+    linha = f"{datetime.now().isoformat()} | cnpj={cnpj} | ultNSU_enviado={ultimo_nsu} | cStat={cstat} | motivo={motivo}\n"
+    with open(LOG_PATH, "a", encoding="utf-8") as f:
+        f.write(linha)
 
 NS = {
     "soap": "http://www.w3.org/2003/05/soap-envelope",
@@ -79,6 +88,8 @@ def consultar_nfe_distribuicao(cnpj, certificado, senha, ambiente="Produção",
     xmotivo = root.find(".//nfe:xMotivo", NS)
     cstat_text = cstat.text if cstat is not None else ""
     motivo = xmotivo.text if xmotivo is not None else ""
+
+    _registrar_chamada(cnpj, ultimo_nsu, cstat_text, motivo)
 
     if cstat_text not in ("138", "137"):
         raise RuntimeError(f"SEFAZ retornou cStat={cstat_text}: {motivo}")

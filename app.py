@@ -1,6 +1,6 @@
 import os
 import socket
-from datetime import date
+from datetime import date, datetime, timedelta
 
 from flask import Flask, flash, get_flashed_messages, redirect, render_template, request, send_file, url_for
 
@@ -9,9 +9,12 @@ from banco import (
     init_db,
     listar_documentos,
     listar_empresas,
+    registrar_bloqueio,
     salvar_documento,
     salvar_empresa,
 )
+
+BLOQUEIO_CONSUMO_INDEVIDO = timedelta(hours=1)
 from certificado import validar_certificado_bytes
 from danfe_pdf import gerar_danfe_pdf
 from sefaz_sp import consultar_nfe_distribuicao
@@ -140,6 +143,18 @@ def consultar():
             flash("A data inicial não pode ser maior que a final.", "error")
             return redirect(url_for("consultar"))
 
+        bloqueado_ate = emp.get("bloqueado_ate")
+        if bloqueado_ate:
+            limite = datetime.fromisoformat(bloqueado_ate)
+            if datetime.now() < limite:
+                minutos = int((limite - datetime.now()).total_seconds() // 60) + 1
+                flash(
+                    f"A SEFAZ bloqueou novas consultas por Consumo Indevido. "
+                    f"Aguarde cerca de {minutos} minuto(s) antes de tentar novamente.",
+                    "error",
+                )
+                return redirect(url_for("consultar"))
+
         try:
             resultado = consultar_nfe_distribuicao(
                 cnpj=emp["cnpj"],
@@ -169,10 +184,21 @@ def consultar():
                     nsu=item["nsu"],
                 )
                 qtd += 1
-            atualizar_nsu(emp["id"], resultado["ult_nsu"])
+            atualizar_nsu(emp["id"], resultado["ult_nsu"], datetime.now().isoformat())
             flash(f"Consulta concluída. Documentos baixados: {qtd}. NSU atual: {resultado['ult_nsu']}", "success")
         except Exception as ex:
-            flash(f"Erro na consulta: {ex}", "error")
+            agora = datetime.now()
+            if "cStat=656" in str(ex):
+                registrar_bloqueio(
+                    emp["id"], agora.isoformat(), (agora + BLOQUEIO_CONSUMO_INDEVIDO).isoformat()
+                )
+                flash(
+                    "Erro na consulta: SEFAZ retornou cStat=656 (Consumo Indevido). "
+                    "Novas tentativas ficarão bloqueadas por 1 hora para evitar bloqueio prolongado.",
+                    "error",
+                )
+            else:
+                flash(f"Erro na consulta: {ex}", "error")
         return redirect(url_for("consultar"))
 
     return render_template(
